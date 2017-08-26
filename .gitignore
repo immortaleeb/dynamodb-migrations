@@ -4,3 +4,6 @@ build/
 
 # Idea
 .idea/
+
+# Configuration files
+dynamodb-migrations.properties
