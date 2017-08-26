@@ -10,10 +10,6 @@ import com.github.immortaleeb.dynamodbmigrations.table.SchemaVersionTableCreator
 
 public class DynamoDBMigrations {
 
-    private static final String DEFAULT_SCHEMA_VERSION_TABLE = "dynamodb_schema_version";
-    private static final long DEFAULT_READ_CAPACITY_UNITS = 1l;
-    private static final long DEFAULT_WRITE_CAPACITY_UNITS = 1l;
-
     private final Configuration configuration;
     private final AmazonDynamoDB client;
 
@@ -40,8 +36,9 @@ public class DynamoDBMigrations {
     }
 
     private void createSchemaVersionTableIfNotExists() {
-        new SchemaVersionTableCreator(this.client).createTable(DEFAULT_SCHEMA_VERSION_TABLE,
-                DEFAULT_READ_CAPACITY_UNITS, DEFAULT_WRITE_CAPACITY_UNITS);
+        new SchemaVersionTableCreator(this.client).createTable(configuration.getDynamoDBSchemaVersionTableName(),
+                configuration.getDynamoDBSchemaVersionTableReadCapacity(),
+                configuration.getDynamoDBSchemaVersionTableWriteCapacity());
     }
 
     public void migrate() {

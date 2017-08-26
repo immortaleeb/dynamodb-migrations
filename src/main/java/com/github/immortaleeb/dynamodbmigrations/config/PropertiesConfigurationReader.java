@@ -18,10 +18,17 @@ public class PropertiesConfigurationReader implements ConfigurationReader {
 
     private static final String DEFAULT_CONFIGURATION_FILE_NAME = "dynamodb-migrations.properties";
 
+    private static final String DEFAULT_SCHEMA_VERSION_TABLE_NAME = "dynamodb_schema_version";
+    private static final long DEFAULT_SCHEMA_VERSION_TABLE_READ_CAPACITY = 1l;
+    private static final long DEFAULT_SCHEMA_VERSION_TABLE_WRITE_CAPACITY = 1l;
+
     private static final String KEY_DYNAMODB_ACCESS_KEY = "dynamodb.accessKey";
     private static final String KEY_DYNAMODB_SECRET_KEY = "dynamodb.secretKey";
     private static final String KEY_DYNAMODB_REGION = "dynamodb.region";
     private static final String KEY_DYNAMODB_ENDPOINT_URL = "dynamodb.endpointUrl";
+    private static final String KEY_DYNAMODB_SCHEMA_VERSION_TABLE_NAME = "dynamodb.schemaVersionTable.name";
+    private static final String KEY_DYNAMODB_SCHEMA_VERSION_TABLE_READ_CAPACITY = "dynamodb.schemaVersionTable.readCapacity";
+    private static final String KEY_DYNAMODB_SCHEMA_VERSION_TABLE_WRITE_CAPACITY = "dynamodb.schemaVersionTable.writeCapacity";
 
     private final String configurationFilename;
 
@@ -78,10 +85,20 @@ public class PropertiesConfigurationReader implements ConfigurationReader {
         String dynamoDBRegion = this.getMandatoryProperty(properties, KEY_DYNAMODB_REGION);
         String dynamoDBEndpointUrl = this.getOptionalProperty(properties, KEY_DYNAMODB_ENDPOINT_URL);
 
+        String dynamoDBSchemaVersionTableName = this.getOptionalProperty(properties,
+                KEY_DYNAMODB_SCHEMA_VERSION_TABLE_NAME, DEFAULT_SCHEMA_VERSION_TABLE_NAME);
+        long dynamoDBSchemaVersionTableReadCapacity = this.getOptionalPropertyAsLong(properties,
+                KEY_DYNAMODB_SCHEMA_VERSION_TABLE_READ_CAPACITY, DEFAULT_SCHEMA_VERSION_TABLE_READ_CAPACITY);
+        long dynamoDBSchemaVersionTableWriteCapacity = this.getOptionalPropertyAsLong(properties,
+                KEY_DYNAMODB_SCHEMA_VERSION_TABLE_WRITE_CAPACITY, DEFAULT_SCHEMA_VERSION_TABLE_WRITE_CAPACITY);
+
         Configuration.Builder configurationBuilder = Configuration.builder()
                 .withDynamoDBAccessKey(dynamoDBAccessKey)
                 .withDynamoDBSecretKey(dynamoDBSecretKey)
-                .withDynamoDBRegion(dynamoDBRegion);
+                .withDynamoDBRegion(dynamoDBRegion)
+                .withDynamoDBSchemaVersionTableName(dynamoDBSchemaVersionTableName)
+                .withDynamoDBSchemaVersionTableReadCapacity(dynamoDBSchemaVersionTableReadCapacity)
+                .withDynamoDBSchemaVersionTableWriteCapacity(dynamoDBSchemaVersionTableWriteCapacity);
 
         if (dynamoDBEndpointUrl != null && !dynamoDBEndpointUrl.isEmpty()) {
             configurationBuilder = configurationBuilder.withDynamoDBEndpointUrl(dynamoDBEndpointUrl);
@@ -93,8 +110,8 @@ public class PropertiesConfigurationReader implements ConfigurationReader {
     private String getMandatoryProperty(Properties properties, String key) {
         String value = properties.getProperty(key);
         if (value == null) {
-            throw new ConfigurationReadException("Could not find mandatory property with key '" +
-                    key + "' in properties file");
+            throw new ConfigurationReadException(
+                    "Could not find mandatory property with key '" + key + "' in properties file");
         }
 
         LOGGER.debug("Found mandatory key '{}' with value '{}'", key, value);
@@ -112,6 +129,30 @@ public class PropertiesConfigurationReader implements ConfigurationReader {
         }
 
         return value;
+    }
+
+    private String getOptionalProperty(Properties properties, String key, String defaultValue) {
+        String value = properties.getProperty(key);
+
+        if (value == null) {
+            value = defaultValue;
+            LOGGER.debug("No value found for optional key '{}', defaulted to '{}'", key, defaultValue);
+        } else {
+            LOGGER.debug("Found optional key '{}' with value '{}'", key, value);
+        }
+
+        return value;
+    }
+
+    private long getOptionalPropertyAsLong(Properties properties, String key, long defaultValue) {
+        String value = this.getOptionalProperty(properties, key, "" + defaultValue);
+
+        try {
+            return Long.parseLong(value);
+        } catch (NumberFormatException e) {
+            throw new ConfigurationReadException(
+                    "'" + value + "' is not a valid long value for property with key '" + key + "'");
+        }
     }
 
 }

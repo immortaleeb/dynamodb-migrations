@@ -7,11 +7,22 @@ public class Configuration {
     private String dynamoDBRegion;
     private String dynamoDBEndpointUrl;
 
+    private String dynamoDBSchemaVersionTableName;
+    private long dynamoDBSchemaVersionTableReadCapacity;
+    private long dynamoDBSchemaVersionTableWriteCapacity;
+
     private Configuration(Builder builder) {
         dynamoDBAccessKey = builder.dynamoDBAccessKey;
         dynamoDBSecretKey = builder.dynamoDBSecretKey;
         dynamoDBRegion = builder.dynamoDBRegion;
         dynamoDBEndpointUrl = builder.dynamoDBEndpointUrl;
+        dynamoDBSchemaVersionTableName = builder.dynamoDBSchemaVersionTableName;
+        dynamoDBSchemaVersionTableReadCapacity = builder.dynamoDBSchemaVersionTableReadCapacity;
+        dynamoDBSchemaVersionTableWriteCapacity = builder.dynamoDBSchemaVersionTableWriteCapacity;
+    }
+
+    public static Builder newBuilder() {
+        return new Builder();
     }
 
     public String getDynamoDBAccessKey() {
@@ -30,6 +41,18 @@ public class Configuration {
         return dynamoDBEndpointUrl;
     }
 
+    public String getDynamoDBSchemaVersionTableName() {
+        return dynamoDBSchemaVersionTableName;
+    }
+
+    public long getDynamoDBSchemaVersionTableReadCapacity() {
+        return dynamoDBSchemaVersionTableReadCapacity;
+    }
+
+    public long getDynamoDBSchemaVersionTableWriteCapacity() {
+        return dynamoDBSchemaVersionTableWriteCapacity;
+    }
+
     public static Builder builder() {
         return new Builder();
     }
@@ -39,6 +62,9 @@ public class Configuration {
         private String dynamoDBSecretKey;
         private String dynamoDBRegion;
         private String dynamoDBEndpointUrl;
+        private String dynamoDBSchemaVersionTableName;
+        private long dynamoDBSchemaVersionTableReadCapacity;
+        private long dynamoDBSchemaVersionTableWriteCapacity;
 
         private Builder() {
         }
@@ -63,9 +89,25 @@ public class Configuration {
             return this;
         }
 
+        public Builder withDynamoDBSchemaVersionTableName(String dynamoDBSchemaVersionTableName) {
+            this.dynamoDBSchemaVersionTableName = dynamoDBSchemaVersionTableName;
+            return this;
+        }
+
+        public Builder withDynamoDBSchemaVersionTableReadCapacity(long dynamoDBSchemaVersionTableReadCapacity) {
+            this.dynamoDBSchemaVersionTableReadCapacity = dynamoDBSchemaVersionTableReadCapacity;
+            return this;
+        }
+
+        public Builder withDynamoDBSchemaVersionTableWriteCapacity(long dynamoDBSchemaVersionTableWriteCapacity) {
+            this.dynamoDBSchemaVersionTableWriteCapacity = dynamoDBSchemaVersionTableWriteCapacity;
+            return this;
+        }
+
         public Configuration build() {
             return new Configuration(this);
         }
+
     }
 
 }
