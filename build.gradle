@@ -11,6 +11,7 @@ repositories {
 dependencies {
     compile "com.amazonaws:aws-java-sdk-dynamodb:${amazonSdkVersion}"
     compile "ch.qos.logback:logback-classic:${logbackVersion}"
+    compile "org.reflections:reflections:${reflectionsVersion}"
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
