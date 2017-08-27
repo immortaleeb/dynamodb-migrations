@@ -11,11 +11,11 @@ import com.amazonaws.services.dynamodbv2.util.TableUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.github.immortaleeb.dynamodbmigrations.table.SchemaVersionConstants.COLUMN_VERSION;
+
 public class SchemaVersionTableCreator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SchemaVersionTableCreator.class);
-
-    private static final String COLUMN_VERSION = "version";
 
     private final AmazonDynamoDB client;
 
