@@ -10,7 +10,7 @@ public class Main {
         Configuration configuration = configurationReader.read();
 
         DynamoDBMigrations dynamoDBMigrations = new DynamoDBMigrations(configuration);
-        dynamoDBMigrations.migrate();
+        dynamoDBMigrations.info();
     }
 
 }

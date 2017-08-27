@@ -6,16 +6,26 @@ import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.github.immortaleeb.dynamodbmigrations.config.Configuration;
+import com.github.immortaleeb.dynamodbmigrations.resolve.AppliedMigrationsResolver;
+import com.github.immortaleeb.dynamodbmigrations.resolve.AppliedMigrationsResolverImpl;
+import com.github.immortaleeb.dynamodbmigrations.migration.MigrationInfo;
 import com.github.immortaleeb.dynamodbmigrations.table.SchemaVersionTableCreator;
+
+import java.util.List;
 
 public class DynamoDBMigrations {
 
     private final Configuration configuration;
     private final AmazonDynamoDB client;
 
+    private final AppliedMigrationsResolver appliedMigrationsResolver;
+
     public DynamoDBMigrations(Configuration configuration) {
         this.configuration = configuration;
         this.client = this.createClient();
+
+        this.appliedMigrationsResolver = new AppliedMigrationsResolverImpl(client,
+                this.configuration.getDynamoDBSchemaVersionTableName());
     }
 
     private AmazonDynamoDB createClient() {
@@ -41,8 +51,15 @@ public class DynamoDBMigrations {
                 configuration.getDynamoDBSchemaVersionTableWriteCapacity());
     }
 
-    public void migrate() {
+    public void info() {
         this.createSchemaVersionTableIfNotExists();
+
+        List<MigrationInfo> appliedMigrations = this.getAppliedMigrations();
+        appliedMigrations.forEach(System.out::println);
+    }
+
+    private List<MigrationInfo> getAppliedMigrations() {
+        return this.appliedMigrationsResolver.resolve();
     }
 
 }
