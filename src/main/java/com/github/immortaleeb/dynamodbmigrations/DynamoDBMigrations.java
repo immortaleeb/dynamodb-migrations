@@ -31,7 +31,8 @@ public class DynamoDBMigrations {
 
         this.appliedMigrationsResolver = new AppliedMigrationsResolver(client,
                 this.configuration.getDynamoDBSchemaVersionTableName());
-        this.availableMigrationsResolver = new AvailableMigrationsResolver(migrationNameResolver);
+        this.availableMigrationsResolver = new AvailableMigrationsResolver(migrationNameResolver,
+                this.configuration.getDynamoDBMigrationsPath());
     }
 
     private AmazonDynamoDB createClient() {

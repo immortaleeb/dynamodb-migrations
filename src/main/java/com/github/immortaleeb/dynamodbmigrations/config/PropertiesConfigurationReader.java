@@ -22,6 +22,8 @@ public class PropertiesConfigurationReader implements ConfigurationReader {
     private static final long DEFAULT_SCHEMA_VERSION_TABLE_READ_CAPACITY = 1l;
     private static final long DEFAULT_SCHEMA_VERSION_TABLE_WRITE_CAPACITY = 1l;
 
+    private static final String DEFAULT_MIGRATIONS_PATH = "db.migrations";
+
     private static final String KEY_DYNAMODB_ACCESS_KEY = "dynamodb.accessKey";
     private static final String KEY_DYNAMODB_SECRET_KEY = "dynamodb.secretKey";
     private static final String KEY_DYNAMODB_REGION = "dynamodb.region";
@@ -29,6 +31,8 @@ public class PropertiesConfigurationReader implements ConfigurationReader {
     private static final String KEY_DYNAMODB_SCHEMA_VERSION_TABLE_NAME = "dynamodb.schemaVersionTable.name";
     private static final String KEY_DYNAMODB_SCHEMA_VERSION_TABLE_READ_CAPACITY = "dynamodb.schemaVersionTable.readCapacity";
     private static final String KEY_DYNAMODB_SCHEMA_VERSION_TABLE_WRITE_CAPACITY = "dynamodb.schemaVersionTable.writeCapacity";
+
+    private static final String KEY_DYNAMODB_MIGRATIONS_PATH = "dynamodb.migrationsPath";
 
     private final String configurationFilename;
 
@@ -92,13 +96,17 @@ public class PropertiesConfigurationReader implements ConfigurationReader {
         long dynamoDBSchemaVersionTableWriteCapacity = this.getOptionalPropertyAsLong(properties,
                 KEY_DYNAMODB_SCHEMA_VERSION_TABLE_WRITE_CAPACITY, DEFAULT_SCHEMA_VERSION_TABLE_WRITE_CAPACITY);
 
+        String dynamoDBMigrationsPath = this.getOptionalProperty(properties, KEY_DYNAMODB_MIGRATIONS_PATH,
+                DEFAULT_MIGRATIONS_PATH);
+
         Configuration.Builder configurationBuilder = Configuration.builder()
                 .withDynamoDBAccessKey(dynamoDBAccessKey)
                 .withDynamoDBSecretKey(dynamoDBSecretKey)
                 .withDynamoDBRegion(dynamoDBRegion)
                 .withDynamoDBSchemaVersionTableName(dynamoDBSchemaVersionTableName)
                 .withDynamoDBSchemaVersionTableReadCapacity(dynamoDBSchemaVersionTableReadCapacity)
-                .withDynamoDBSchemaVersionTableWriteCapacity(dynamoDBSchemaVersionTableWriteCapacity);
+                .withDynamoDBSchemaVersionTableWriteCapacity(dynamoDBSchemaVersionTableWriteCapacity)
+                .withDynamoDBMigrationsPath(dynamoDBMigrationsPath);
 
         if (dynamoDBEndpointUrl != null && !dynamoDBEndpointUrl.isEmpty()) {
             configurationBuilder = configurationBuilder.withDynamoDBEndpointUrl(dynamoDBEndpointUrl);
