@@ -13,6 +13,7 @@ import com.github.immortaleeb.dynamodbmigrations.resolve.MigrationNameResolverIm
 import com.github.immortaleeb.dynamodbmigrations.resolve.MigrationsResolver;
 import com.github.immortaleeb.dynamodbmigrations.resolve.AppliedMigrationsResolver;
 import com.github.immortaleeb.dynamodbmigrations.migration.MigrationInfo;
+import com.github.immortaleeb.dynamodbmigrations.resolve.ToApplyMigrationsResolver;
 import com.github.immortaleeb.dynamodbmigrations.table.SchemaVersionTableCreator;
 
 import java.util.List;
@@ -67,6 +68,8 @@ public class DynamoDBMigrations {
 
         List<MigrationInfo> appliedMigrations = this.getAppliedMigrations();
         List<MigrationInfo> availableMigrations = this.getAvailableMigrations();
+        List<MigrationInfo> toApplyMigrations = new ToApplyMigrationsResolver(appliedMigrations,
+                availableMigrations).resolve();
 
         System.out.println("Applied migrations");
         appliedMigrations.forEach(System.out::println);
@@ -74,6 +77,10 @@ public class DynamoDBMigrations {
 
         System.out.println("Available migrations");
         availableMigrations.forEach(System.out::println);
+        System.out.println();
+
+        System.out.println("Migrations to be applied");
+        toApplyMigrations.forEach(System.out::println);
         System.out.println();
     }
 
