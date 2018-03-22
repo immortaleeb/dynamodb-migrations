@@ -1,32 +1,26 @@
 package com.github.immortaleeb.dynamodbmigrations.resolve;
 
-import com.github.immortaleeb.dynamodbmigrations.migration.DynamoDBMigration;
+import com.github.immortaleeb.dynamodbmigrations.migration.ClassMigrationsProvider;
 import com.github.immortaleeb.dynamodbmigrations.migration.MigrationInfo;
-import org.reflections.Reflections;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class AvailableMigrationsResolver implements MigrationsResolver {
 
-    private final String migrationsPath;
     private final MigrationNameResolver migrationNameResolver;
-    private final MigrationNameVersionComparator migrationNameVersionComparator;
+    private final ClassMigrationsProvider migrationsProvider;
 
-    public AvailableMigrationsResolver(MigrationNameResolver migrationNameResolver, String migrationsPath) {
-        this.migrationsPath = migrationsPath;
+    public AvailableMigrationsResolver(MigrationNameResolver migrationNameResolver,
+                                       ClassMigrationsProvider migrationsProvider) {
         this.migrationNameResolver = migrationNameResolver;
-        this.migrationNameVersionComparator = new MigrationNameVersionComparator(migrationNameResolver);
+        this.migrationsProvider = migrationsProvider;
     }
 
     @Override
     public List<MigrationInfo> resolve() {
-        Reflections reflections = new Reflections(migrationsPath);
-
-        return reflections.getSubTypesOf(DynamoDBMigration.class)
+        return this.migrationsProvider.provideMigrationClasses()
                 .stream()
-                .sorted(Comparator.comparing(Class::getSimpleName, migrationNameVersionComparator))
                 .map(clazz -> ClassMigrationInfo.of(clazz, migrationNameResolver))
                 .collect(Collectors.toList());
     }

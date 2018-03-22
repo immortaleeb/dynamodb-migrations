@@ -6,7 +6,9 @@ import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.github.immortaleeb.dynamodbmigrations.config.Configuration;
+import com.github.immortaleeb.dynamodbmigrations.migration.ClassMigrationsProvider;
 import com.github.immortaleeb.dynamodbmigrations.resolve.AvailableMigrationsResolver;
+import com.github.immortaleeb.dynamodbmigrations.resolve.ClassMigrationsProviderFactory;
 import com.github.immortaleeb.dynamodbmigrations.resolve.MigrationNameResolverImpl;
 import com.github.immortaleeb.dynamodbmigrations.resolve.MigrationsResolver;
 import com.github.immortaleeb.dynamodbmigrations.resolve.AppliedMigrationsResolver;
@@ -28,11 +30,13 @@ public class DynamoDBMigrations {
         this.client = this.createClient();
 
         MigrationNameResolverImpl migrationNameResolver = new MigrationNameResolverImpl();
+        ClassMigrationsProviderFactory migrationsProviderFactory = new ClassMigrationsProviderFactory(
+                migrationNameResolver);
+        ClassMigrationsProvider migrationsProvider = migrationsProviderFactory.createProvider(this.configuration);
 
         this.appliedMigrationsResolver = new AppliedMigrationsResolver(client,
                 this.configuration.getDynamoDBSchemaVersionTableName());
-        this.availableMigrationsResolver = new AvailableMigrationsResolver(migrationNameResolver,
-                this.configuration.getDynamoDBMigrationsPath());
+        this.availableMigrationsResolver = new AvailableMigrationsResolver(migrationNameResolver, migrationsProvider);
     }
 
     private AmazonDynamoDB createClient() {
