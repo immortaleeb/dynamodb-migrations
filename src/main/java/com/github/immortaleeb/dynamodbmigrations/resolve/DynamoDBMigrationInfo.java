@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
+import java.util.function.Function;
 
 public class DynamoDBMigrationInfo implements MigrationInfo {
 
@@ -22,16 +23,24 @@ public class DynamoDBMigrationInfo implements MigrationInfo {
 
     private DynamoDBMigrationInfo(Map<String, AttributeValue> item) {
         this.item = item;
-        this.version = this.getMandatoryColumn(SchemaVersionConstants.COLUMN_VERSION);
-        this.description = this.getMandatoryColumn(SchemaVersionConstants.COLUMN_DESCRIPTION);
-        this.script = this.getMandatoryColumn(SchemaVersionConstants.COLUMN_SCRIPT);
+        this.version = this.getMandatoryStringColumn(SchemaVersionConstants.COLUMN_VERSION);
+        this.description = this.getMandatoryStringColumn(SchemaVersionConstants.COLUMN_DESCRIPTION);
+        this.script = this.getMandatoryStringColumn(SchemaVersionConstants.COLUMN_SCRIPT);
         this.appliedOn = this.getAppliedOnFromItem();
         this.executionTime = this.getExecutionTimeFromItem();
     }
 
-    private String getMandatoryColumn(String columnName) {
+    private String getMandatoryStringColumn(String columnName) {
+        return getMandatoryColumn(columnName, AttributeValue::getS);
+    }
+
+    private String getMandatoryNumberColumn(String columnName) {
+        return getMandatoryColumn(columnName, AttributeValue::getN);
+    }
+
+    private String getMandatoryColumn(String columnName, Function<AttributeValue, String> getValue) {
         AttributeValue attributeValue = this.item.get(columnName);
-        String value = attributeValue == null ? null : attributeValue.getS();
+        String value = attributeValue == null ? null : getValue.apply(attributeValue);
         if (value == null) {
             throw new IllegalArgumentException("Item is missing value for mandatory column '" + columnName + "'");
         }
@@ -39,12 +48,12 @@ public class DynamoDBMigrationInfo implements MigrationInfo {
     }
 
     private LocalDateTime getAppliedOnFromItem() {
-        String appliedOnString = this.getMandatoryColumn(SchemaVersionConstants.COLUMN_APPLIED_ON);
+        String appliedOnString = this.getMandatoryStringColumn(SchemaVersionConstants.COLUMN_APPLIED_ON);
         return LocalDateTime.parse(appliedOnString, DateTimeFormatter.ISO_DATE_TIME);
     }
 
     private Duration getExecutionTimeFromItem() {
-        String executionTimeString = this.getMandatoryColumn(SchemaVersionConstants.COLUMN_EXECUTION_TIME);
+        String executionTimeString = this.getMandatoryNumberColumn(SchemaVersionConstants.COLUMN_EXECUTION_TIME);
         return Duration.of(Long.valueOf(executionTimeString), ChronoUnit.MILLIS);
     }
 
