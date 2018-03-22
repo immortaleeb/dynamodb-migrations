@@ -23,6 +23,7 @@ public class PropertiesConfigurationReader implements ConfigurationReader {
     private static final long DEFAULT_SCHEMA_VERSION_TABLE_WRITE_CAPACITY = 1l;
 
     private static final String DEFAULT_MIGRATIONS_PATH = "db.migrations";
+    private static final String DEFAULT_MIGRATIONS_PROVIDER = null;
 
     private static final String KEY_DYNAMODB_ACCESS_KEY = "dynamodb.accessKey";
     private static final String KEY_DYNAMODB_SECRET_KEY = "dynamodb.secretKey";
@@ -33,6 +34,7 @@ public class PropertiesConfigurationReader implements ConfigurationReader {
     private static final String KEY_DYNAMODB_SCHEMA_VERSION_TABLE_WRITE_CAPACITY = "dynamodb.schemaVersionTable.writeCapacity";
 
     private static final String KEY_DYNAMODB_MIGRATIONS_PATH = "dynamodb.migrationsPath";
+    private static final String KEY_DYNAMODB_MIGRATIONS_PROVIDER = "dynamodb.migrationsProvider";
 
     private final String configurationFilename;
 
@@ -98,6 +100,8 @@ public class PropertiesConfigurationReader implements ConfigurationReader {
 
         String dynamoDBMigrationsPath = this.getOptionalProperty(properties, KEY_DYNAMODB_MIGRATIONS_PATH,
                 DEFAULT_MIGRATIONS_PATH);
+        String dynamoDBMigrationsProvider = this.getOptionalProperty(properties, KEY_DYNAMODB_MIGRATIONS_PROVIDER,
+                DEFAULT_MIGRATIONS_PROVIDER);
 
         Configuration.Builder configurationBuilder = Configuration.builder()
                 .withDynamoDBAccessKey(dynamoDBAccessKey)
@@ -106,7 +110,8 @@ public class PropertiesConfigurationReader implements ConfigurationReader {
                 .withDynamoDBSchemaVersionTableName(dynamoDBSchemaVersionTableName)
                 .withDynamoDBSchemaVersionTableReadCapacity(dynamoDBSchemaVersionTableReadCapacity)
                 .withDynamoDBSchemaVersionTableWriteCapacity(dynamoDBSchemaVersionTableWriteCapacity)
-                .withDynamoDBMigrationsPath(dynamoDBMigrationsPath);
+                .withDynamoDBMigrationsPath(dynamoDBMigrationsPath)
+                .withDynamoDBMigrationsProvider(dynamoDBMigrationsProvider);
 
         if (dynamoDBEndpointUrl != null && !dynamoDBEndpointUrl.isEmpty()) {
             configurationBuilder = configurationBuilder.withDynamoDBEndpointUrl(dynamoDBEndpointUrl);

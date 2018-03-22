@@ -12,6 +12,7 @@ public class Configuration {
     private long dynamoDBSchemaVersionTableWriteCapacity;
 
     private String dynamoDBMigrationsPath;
+    private String dynamoDBMigrationsProvider;
 
     private Configuration(Builder builder) {
         dynamoDBAccessKey = builder.dynamoDBAccessKey;
@@ -22,6 +23,7 @@ public class Configuration {
         dynamoDBSchemaVersionTableReadCapacity = builder.dynamoDBSchemaVersionTableReadCapacity;
         dynamoDBSchemaVersionTableWriteCapacity = builder.dynamoDBSchemaVersionTableWriteCapacity;
         dynamoDBMigrationsPath = builder.dynamoDBMigrationsPath;
+        dynamoDBMigrationsProvider = builder.dynamoDBMigrationsProvider;
     }
 
     public String getDynamoDBAccessKey() {
@@ -56,6 +58,10 @@ public class Configuration {
         return dynamoDBMigrationsPath;
     }
 
+    public String getDynamoDBMigrationsProvider() {
+        return dynamoDBMigrationsProvider;
+    }
+
     public static Builder builder() {
         return new Builder();
     }
@@ -69,6 +75,7 @@ public class Configuration {
         private long dynamoDBSchemaVersionTableReadCapacity;
         private long dynamoDBSchemaVersionTableWriteCapacity;
         private String dynamoDBMigrationsPath;
+        private String dynamoDBMigrationsProvider;
 
         private Builder() {
         }
@@ -110,6 +117,11 @@ public class Configuration {
 
         public Builder withDynamoDBMigrationsPath(String dynamoDBMigrationsPath) {
             this.dynamoDBMigrationsPath = dynamoDBMigrationsPath;
+            return this;
+        }
+
+        public Builder withDynamoDBMigrationsProvider(String dynamoDBMigrationsProvider) {
+            this.dynamoDBMigrationsProvider = dynamoDBMigrationsProvider;
             return this;
         }
 
