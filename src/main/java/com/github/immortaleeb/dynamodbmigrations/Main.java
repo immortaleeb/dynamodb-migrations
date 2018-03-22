@@ -11,6 +11,7 @@ public class Main {
 
         DynamoDBMigrations dynamoDBMigrations = new DynamoDBMigrations(configuration);
         dynamoDBMigrations.info();
+        dynamoDBMigrations.migrate();
     }
 
 }

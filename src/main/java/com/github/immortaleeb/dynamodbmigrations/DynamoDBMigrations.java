@@ -8,8 +8,10 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.github.immortaleeb.dynamodbmigrations.config.Configuration;
 import com.github.immortaleeb.dynamodbmigrations.migration.ClassMigrationsProvider;
 import com.github.immortaleeb.dynamodbmigrations.resolve.AvailableMigrationsResolver;
+import com.github.immortaleeb.dynamodbmigrations.resolve.ClassMigrationsApplier;
 import com.github.immortaleeb.dynamodbmigrations.resolve.ClassMigrationsProviderFactory;
 import com.github.immortaleeb.dynamodbmigrations.resolve.MigrationNameResolverImpl;
+import com.github.immortaleeb.dynamodbmigrations.resolve.MigrationsApplier;
 import com.github.immortaleeb.dynamodbmigrations.resolve.MigrationsResolver;
 import com.github.immortaleeb.dynamodbmigrations.resolve.AppliedMigrationsResolver;
 import com.github.immortaleeb.dynamodbmigrations.migration.MigrationInfo;
@@ -82,6 +84,24 @@ public class DynamoDBMigrations {
         System.out.println("Migrations to be applied");
         toApplyMigrations.forEach(System.out::println);
         System.out.println();
+    }
+
+    public void migrate() {
+        List<MigrationInfo> appliedMigrations = this.getAppliedMigrations();
+        List<MigrationInfo> availableMigrations = this.getAvailableMigrations();
+        List<MigrationInfo> toApplyMigrations = new ToApplyMigrationsResolver(appliedMigrations,
+                availableMigrations).resolve();
+
+        if (toApplyMigrations.isEmpty()) {
+            System.out.println("No migrations found that need to be applied");
+        } else {
+            System.out.format("Found %d migrations that need to be applied\n", toApplyMigrations.size());
+
+            System.out.println("Migrating...");
+            ClassMigrationsApplier migrationsApplier = new ClassMigrationsApplier(this.client,
+                    this.configuration.getDynamoDBSchemaVersionTableName());
+            migrationsApplier.apply(toApplyMigrations);
+        }
     }
 
     private List<MigrationInfo> getAppliedMigrations() {
