@@ -11,6 +11,7 @@ import com.amazonaws.services.dynamodbv2.util.TableUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.github.immortaleeb.dynamodbmigrations.table.SchemaVersionConstants.COLUMN_SCRIPT;
 import static com.github.immortaleeb.dynamodbmigrations.table.SchemaVersionConstants.COLUMN_VERSION;
 
 public class SchemaVersionTableCreator {
@@ -25,11 +26,11 @@ public class SchemaVersionTableCreator {
 
     public void createTable(String tableName, long readCapacityUnits, long writeCapacityUnits) {
         KeySchemaElement versionKeySchemaElement = new KeySchemaElement()
-                .withAttributeName(COLUMN_VERSION)
+                .withAttributeName(COLUMN_SCRIPT)
                 .withKeyType(KeyType.HASH);
 
         AttributeDefinition versionAttributeDefinition = new AttributeDefinition()
-                .withAttributeName(COLUMN_VERSION)
+                .withAttributeName(COLUMN_SCRIPT)
                 .withAttributeType(ScalarAttributeType.S);
 
         CreateTableRequest createTableRequest = new CreateTableRequest().withTableName(tableName)
