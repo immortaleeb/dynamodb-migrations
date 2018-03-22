@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 
 public class ClassMigrationInfo implements MigrationInfo {
 
+    private final Class<? extends DynamoDBMigration> migrationClass;
     private final String version;
     private final String description;
     private final String script;
@@ -15,9 +16,14 @@ public class ClassMigrationInfo implements MigrationInfo {
     public <T extends DynamoDBMigration> ClassMigrationInfo(Class<T> clazz, MigrationNameResolver migrationNameResolver) {
         String simpleName = clazz.getSimpleName();
 
+        this.migrationClass = clazz;
         this.version = migrationNameResolver.resolveVersion(simpleName);
         this.description = migrationNameResolver.resolveDescription(simpleName);
         this.script = simpleName + ".class";
+    }
+
+    public Class<? extends DynamoDBMigration> getMigrationClass() {
+        return migrationClass;
     }
 
     @Override
